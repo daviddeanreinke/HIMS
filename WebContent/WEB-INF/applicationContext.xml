@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+	<context:component-scan base-package="com.revature.model"/>
+	<context:component-scan base-package="com.revature.business"/>
+	
+	<bean id="serverDataSource"
+		  class="org.springframework.jndi.JndiObjectFactoryBean">
+		  <property name="jndiName" value="jdbc/testDS"/>
+		  <property name="jndiEnvironment">
+		  	<props>
+		  		<prop key="java.naming.factory.initial">weblogic.jndi.WLInitialContextFactory</prop>
+		  		<prop key="java.naming.factory.provider.url">t3://localhost:7001</prop>
+		  	</props>
+		  </property>
+	</bean>
+		
+		  
+		  
+	<bean id="sessionFactory"
+		  class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		  <property name="packagesToScan" value="com.revature.model"/>
+		  <property name="hibernateProperties">
+		  	<props>
+		  		<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+		  		<prop key="hibernate.hbm2ddl.auto">update</prop>
+		  	</props>
+		  </property>
+		  <property name="dataSource" ref="serverDataSource"/>
+	</bean>
+		
+		
+		  
+	<bean id="myTransactionManager"
+		  class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		  <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="myTransactionManager"/>
+	
+	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+	
+</beans>
